@@ -1,39 +1,24 @@
 # NOMAD AWS DEMO
 
-This repo creates a **demo** Nomad cluster (OSS or ENT) on AWS.
+## Envirionment Build Instructions
 
-**This is not production ready and does not follow the security best practices!  
-Use for demo and testing purposes only**
+1. Login into the AWS console and create a key pair called nomad-aws-key, go to ```EC2 Dashboard``` -> ```Key Pairs``` -> ```Create key pair``` -> enter key pair name, this will
+   result in a file called nomad-aws-key.pem being downloaded.
 
-Features:
-- native service discovery (no consul)
-- AWS Cloud Auto-join
-- acl (disabled by default)
-- TLS (disabled by default)
+2. Create a Nomad gossip key on the laptop or PC where you intend to deploy Nomad from:
+```
+$ openssl rand -base64 32
+```
 
-
-Most of the heavy litfing is performed by user_data, that renders two template files: one for the [servers](config/install-server.sh.tpl) and one of the [clients](config/install-client.sh.tpl)
-These scripts perform the installation, configuration and initialization of the cluster.
-
-
-## Configuration
-Defaults (see variables.tf for the full list):
-- server_count: `3`
-- client_count: `3`
-- nomad_ent: `true`
-- nomad_version: `1.6.1+ent-1`
-- retry_join: `"provider=aws tag_key=NomadAutoJoin tag_value=auto-join"`
-- nomad_acl_enabled: `false`
-- nomad_tls_enabled: `false`
-
-A ".auto.tfvars" file is used to override the required values. (this way terraform loads it automatically)  
-To start, copy the `terraform.auto.tfvars.example` file and name it `terraform.auto.tfvars` , then input the values.
-
-### Mandatory variables:
-
-- `key_name`: the name of an existing SSH keypair in AWS
-- `nomad_gossip_key`: generate one following [this guide](https://developer.hashicorp.com/nomad/tutorials/transport-security/security-gossip-encryption)
+3. Open the terraform.tfvars file and assign:
+- an AMI id to the ami variable, the default in the file is for Ubuntu 22.04 in the ```us-east-1``` region, leave this as is if this is the region being deployed to,
+  otherwise change this as is appropriate
+   
+- the string that this command generates to ```nomad_gossip_key``` in the ```terraform.tfvars``` file.
 - `nomad_license`: the Nomad Enterprise license (only if using ENT version)
+- uncomment the Nomad Enterprise / Nomad OSS blocks as appropriate
+
+4. Specify the environment variables for 
 
 ### Optional configuration
 #### enable ACL  
