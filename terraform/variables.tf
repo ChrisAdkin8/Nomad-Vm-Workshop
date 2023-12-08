@@ -107,3 +107,36 @@ variable "nomad_tls_verify_https_client" {
   description = "https://developer.hashicorp.com/nomad/docs/configuration/tls#verify_https_client"
   default     = "true"
 }
+
+# 
+# Variables used by the part of the config for HCP Consul cluster creation
+# 
+
+variable "hvn_id" {
+  description = "The ID of the HCP HVN."
+  type        = string
+  default     = "hvn-id"
+}
+
+variable "cluster_id" {
+  description = "The ID of the HCP Consul cluster."
+  type        = string
+  default     = "HCP-consul-cluster-id"
+}
+
+variable "cloud_provider" {
+  description = "The cloud provider of the HCP HVN and Consul cluster."
+  type        = string
+  default     = "aws"
+}
+variable "peering_id" {
+  description = "The ID of the HCP peering connection."
+  type        = string
+  default     = "hcp-peering-connection-id"
+}
+
+variable "route_id" {
+  description = "The ID of the HCP HVN route."
+  type        = string
+  default     = "hcp-hvn-route-id"
+}

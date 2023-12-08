@@ -28,7 +28,7 @@ resource "aws_key_pair" "keypair" {
 
 resource "aws_security_group" "nomad_ui_ingress" {
   name   = "${var.name}-ui-ingress"
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = aws_vpc.peer.id
 
   # Nomad
   ingress {
@@ -55,7 +55,7 @@ resource "aws_security_group" "nomad_ui_ingress" {
 
 resource "aws_security_group" "ssh_ingress" {
   name   = "${var.name}-ssh-ingress"
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = aws_vpc.peer.id
 
   # SSH
   ingress {
@@ -82,7 +82,7 @@ resource "aws_security_group" "ssh_ingress" {
 
 resource "aws_security_group" "allow_all_internal" {
   name   = "${var.name}-allow-all-internal"
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = aws_vpc.peer.id
 
   ingress {
     from_port = 0
@@ -101,7 +101,7 @@ resource "aws_security_group" "allow_all_internal" {
 
 resource "aws_security_group" "clients_ingress" {
   name   = "${var.name}-clients-ingress"
-  vpc_id = data.aws_vpc.default.id
+  vpc_id = aws_vpc.peer.id
 
   ingress {
     from_port = 0
