@@ -1,16 +1,8 @@
 # NOMAD AWS DEMO
 
-## Envirionment Build Instructions
+## Environment Build Instructions
 
-1. Login into the AWS console and create a key pair called nomad-aws-key, go to ```EC2 Dashboard``` -> ```Key Pairs``` -> ```Create key pair``` -> enter key pair name, this will
-   result in a file called nomad-aws-key.pem being downloaded.
-
-2. Create a Nomad gossip key on the laptop or PC where you intend to deploy Nomad from:
-```
-$ openssl rand -base64 32
-```
-
-3. Open the terraform.tfvars file and assign:
+1. Open the terraform.tfvars file and assign:
 - an AMI id to the ami variable, the default in the file is for Ubuntu 22.04 in the ```us-east-1``` region, leave this as is if this is the region being deployed to,
   otherwise change this as is appropriate
    
@@ -18,7 +10,22 @@ $ openssl rand -base64 32
 - `nomad_license`: the Nomad Enterprise license (only if using ENT version)
 - uncomment the Nomad Enterprise / Nomad OSS blocks as appropriate
 
-4. Specify the environment variables for 
+2. Specify the environment variables in order that terraform can connect to your AWS account:
+```
+export AWS_ACCESS_KEY_ID=<your AWS access key ID>
+export AWS_SECRET_ACCESS_KEY=<your AWS secret access key>
+export AWS_SESSION_TOKEN=<your AWS session token>
+```
+
+3. Log into HashiCorp Cloud Platform and create a service principal:
+
+4. Generate a key for your service principal:
+
+5. Specify environment variables for your HCP Client Id and Client secret:
+```
+export HCP_CLIENT_ID=<your client id>
+export HCP_CLIENT_SECRET=<the key generated>
+```
 
 ### Optional configuration
 #### enable ACL  
