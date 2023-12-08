@@ -107,7 +107,3 @@ variable "nomad_tls_verify_https_client" {
   description = "https://developer.hashicorp.com/nomad/docs/configuration/tls#verify_https_client"
   default     = "true"
 }
-
-variable "key_material" {
-  description = "Material for AWS key pair creation"
-}

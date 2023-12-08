@@ -56,3 +56,4 @@ terraform.rc
 
 # Sentinel runtime directory
 .sentinel
+nohup.out

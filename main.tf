@@ -10,6 +10,22 @@ data "http" "myip" {
   url = "http://ipv4.icanhazip.com"
 }
 
+resource "tls_private_key" "keypair_private_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "keypair" {
+  key_name   = "id_rsa.pub.aws_nomad"
+
+  public_key = tls_private_key.keypair_private_key.public_key_openssh
+
+  # Create "id_rsa.pem" in local directory
+  provisioner "local-exec" {
+    command = "rm -rf certs/id_rsa.pem && mkdir -p certs &&  echo '${tls_private_key.keypair_private_key.private_key_pem}' > certs/id_rsa.pem && chmod 400 certs/id_rsa.pem"
+  }
+}
+
 resource "aws_security_group" "nomad_ui_ingress" {
   name   = "${var.name}-ui-ingress"
   vpc_id = data.aws_vpc.default.id
@@ -116,7 +132,7 @@ resource "aws_security_group" "clients_ingress" {
 resource "aws_instance" "server" {
   ami                    = var.ami
   instance_type          = var.server_instance_type
-  key_name               = var.key_name 
+  key_name               = aws_key_pair.keypair.key_name 
   vpc_security_group_ids = [aws_security_group.nomad_ui_ingress.id, aws_security_group.ssh_ingress.id, aws_security_group.allow_all_internal.id]
   count                  = var.server_count
   user_data = templatefile("${path.module}/config/install-server.sh.tpl", {
@@ -165,7 +181,7 @@ resource "aws_instance" "server" {
 resource "aws_instance" "client" {
   ami                    = var.ami
   instance_type          = var.client_instance_type
-  key_name               = var.key_name 
+  key_name               = aws_key_pair.keypair.key_name 
   vpc_security_group_ids = [aws_security_group.nomad_ui_ingress.id, aws_security_group.ssh_ingress.id, aws_security_group.clients_ingress.id, aws_security_group.allow_all_internal.id]
   count                  = var.client_count
   depends_on             = [aws_instance.server]
