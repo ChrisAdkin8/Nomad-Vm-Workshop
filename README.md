@@ -19,9 +19,13 @@ export AWS_SESSION_TOKEN=<your AWS session token>
 
 3. Log into HashiCorp Cloud Platform and create a service principal:
 
-4. Generate a key for your service principal:
+4. Hit 'Generate key' for your service principal:
 
-5. Specify environment variables for your HCP Client Id and Client secret:
+02-HCP-Create-Sp-Key.png
+
+5. Make a note the of the key's Client Id and Client Secret:
+
+6. Specify environment variables for your HCP Client Id and Client secret:
 ```
 export HCP_CLIENT_ID=<your client id>
 export HCP_CLIENT_SECRET=<the key generated>
