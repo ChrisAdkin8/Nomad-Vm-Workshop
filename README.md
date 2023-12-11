@@ -49,9 +49,7 @@ $ terraform init
 ```
     
 10. Apply the configuration:
-```
-$ terraform apply -auto-approve
-```
+```$ terraform apply -auto-approve```
     When the configuration is fully applied, 23 new resources should appear in yuor AWS account.
     
 
