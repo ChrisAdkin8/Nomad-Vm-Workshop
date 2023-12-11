@@ -10,28 +10,50 @@
 - `nomad_license`: the Nomad Enterprise license (only if using ENT version)
 - uncomment the Nomad Enterprise / Nomad OSS blocks as appropriate
 
-2. Specify the environment variables in order that terraform can connect to your AWS account:
+2. Log into HashiCorp Cloud Platform and create a service principal:
+<img style="float: left; margin: 0px 15px 15px 0px;" src="https://github.com/ChrisAdkin8/Nomad-Vm-Workshop/blob/main/png_images/01-HCP-Consul-Sp.png?raw=true">
+
+3. Hit 'Create service principal key' for your service principal:
+<img style="float: left; margin: 0px 15px 15px 0px;" src="https://github.com/ChrisAdkin8/Nomad-Vm-Workshop/blob/main/png_images/02-HCP-Create-Sp-Key.png?raw=true">
+
+4. Make a note the of the key's Client Id and Client Secret:
+<img style="float: left; margin: 0px 15px 15px 0px;" src="https://github.com/ChrisAdkin8/Nomad-Vm-Workshop/blob/main/png_images/03-HCP-Sp-Key.png?raw=true">
+
+5. Specify environment variables for your HCP Client Id, Client secret and project:
+```
+export HCP_CLIENT_ID=<your client id>
+export HCP_CLIENT_SECRET=<the key generated>
+export HCP_PROJECT_ID=<your project id>
+```
+
+6. Clone this repo:
+```
+$ git clone 
+```
+
+7. Change directory to ```Nomad-Vm-Workshop/terraform```:
+```
+$ cd Nomad-Vm-Workshop/terraform
+```
+
+8. Specify the environment variables in order that terraform can connect to your AWS account:
 ```
 export AWS_ACCESS_KEY_ID=<your AWS access key ID>
 export AWS_SECRET_ACCESS_KEY=<your AWS secret access key>
 export AWS_SESSION_TOKEN=<your AWS session token>
 ```
 
-3. Log into HashiCorp Cloud Platform and create a service principal:
-<img style="float: left; margin: 0px 15px 15px 0px;" src="https://github.com/ChrisAdkin8/Nomad-Vm-Workshop/blob/main/png_images/01-HCP-Consul-Sp.png?raw=true">
-
-4. Hit 'Create service principal key' for your service principal:
-<img style="float: left; margin: 0px 15px 15px 0px;" src="https://github.com/ChrisAdkin8/Nomad-Vm-Workshop/blob/main/png_images/02-HCP-Create-Sp-Key.png?raw=true">
-
-5. Make a note the of the key's Client Id and Client Secret:
-<img style="float: left; margin: 0px 15px 15px 0px;" src="https://github.com/ChrisAdkin8/Nomad-Vm-Workshop/blob/main/png_images/03-HCP-Sp-Key.png?raw=true">
-
-6. Specify environment variables for your HCP Client Id, Client secret and project:
+9. Install the provider plugins required by the configuration:
 ```
-export HCP_CLIENT_ID=<your client id>
-export HCP_CLIENT_SECRET=<the key generated>
-export HCP_PROJECT_ID=<your project id>
+$ terraform init
 ```
+    
+10. Apply the configuration:
+```
+$ terraform apply -auto-approve
+```
+    When the configuration is fully applied, 23 new resources should appear in yuor AWS account.
+    
 
 ### Optional configuration
 #### enable ACL  
