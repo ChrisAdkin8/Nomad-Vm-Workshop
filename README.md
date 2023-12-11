@@ -1,4 +1,8 @@
-# NOMAD AWS DEMO
+# NOMAD Virtual Machine Demo
+
+This repo represents a work in progress:
+
+- The Consul cluster element of the configuration is based upon [this HashiCorp tutorial](https://developer.hashicorp.com/consul/tutorials/cloud-production/terraform-hcp-consul-provider)
 
 ## Environment Build Instructions
 
@@ -48,12 +52,10 @@ export AWS_SESSION_TOKEN=<your AWS session token>
 $ terraform init
 ```
     
-10. Apply the configuration:
+10. Apply the configuration, this will result in the creation of 23 new resources:
 ```
 $ terraform apply -auto-approve
-```
-  When the configuration is fully applied, 23 new resources should appear in yuor AWS account.
-    
+```    
 
 ### Optional configuration
 #### enable ACL  
