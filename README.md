@@ -93,10 +93,3 @@ If you are using different names or paths for your certificates, change the rela
 set `nomad_tls_enabled: true` to enable TLS on the nomad cluster
 
 Follow then this [section of the guide](https://developer.hashicorp.com/nomad/tutorials/transport-security/security-enable-tls#running-with-tls) to configure your CLI (or set nomad_tls_verify_https_client to false)      
-
-## Run!
-to provision the cluster run  
-`terraform apply`
-
-The `user_data` execution on the remote servers and clients takes a few minutes to complete.  
-To check the progress ssh into the instance and `tail -f /var/log/cloud-init-output.log`
