@@ -18,13 +18,13 @@ export AWS_SESSION_TOKEN=<your AWS session token>
 ```
 
 3. Log into HashiCorp Cloud Platform and create a service principal:
-
 <img style="float: left; margin: 0px 15px 15px 0px;" src="https://github.com/ChrisAdkin8/Nomad-Vm-Workshop/blob/main/png_images/01-HCP-Consul-Sp.png?raw=true">
 
 4. Hit 'Create service principal key' for your service principal:
 <img style="float: left; margin: 0px 15px 15px 0px;" src="https://github.com/ChrisAdkin8/Nomad-Vm-Workshop/blob/main/png_images/02-HCP-Create-Sp-Key.png?raw=true">
 
 5. Make a note the of the key's Client Id and Client Secret:
+<img style="float: left; margin: 0px 15px 15px 0px;" src="https://github.com/ChrisAdkin8/Nomad-Vm-Workshop/blob/main/png_images/03-HCP-Sp-Key.png?raw=true">
 
 6. Specify environment variables for your HCP Client Id and Client secret:
 ```
