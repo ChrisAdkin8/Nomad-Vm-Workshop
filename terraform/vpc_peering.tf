@@ -1,5 +1,5 @@
 resource "aws_vpc" "peer" {
-  cidr_block = "172.31.0.0/16"
+  cidr_block = local.cidr_block
 }
 
 data "aws_arn" "peer" {

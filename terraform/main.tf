@@ -2,10 +2,6 @@ provider "aws" {
   region = var.region
 }
 
-data "aws_vpc" "default" {
-  default = true
-}
-
 data "http" "myip" {
   url = "http://ipv4.icanhazip.com"
 }
@@ -49,7 +45,7 @@ resource "aws_security_group" "nomad_ui_ingress" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ local.cidr_block ]
   }
 }
 
@@ -76,7 +72,7 @@ resource "aws_security_group" "ssh_ingress" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ local.cidr_block ]
   }
 }
 
@@ -95,7 +91,7 @@ resource "aws_security_group" "allow_all_internal" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ local.cidr_block ]
   }
 }
 
@@ -114,7 +110,7 @@ resource "aws_security_group" "clients_ingress" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ local.cidr_block ]
   }
 
   # Add application ingress rules here
@@ -125,13 +121,14 @@ resource "aws_security_group" "clients_ingress" {
   #   from_port   = 80
   #   to_port     = 80
   #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
+  #   cidr_blocks = [ local.cidr_block ]
   # }
 }
 
 resource "aws_instance" "server" {
   ami                    = var.ami
   instance_type          = var.server_instance_type
+  subnet_id              = aws_subnet.nomad.id
   key_name               = aws_key_pair.keypair.key_name 
   vpc_security_group_ids = [aws_security_group.nomad_ui_ingress.id, aws_security_group.ssh_ingress.id, aws_security_group.allow_all_internal.id]
   count                  = var.server_count
@@ -178,9 +175,19 @@ resource "aws_instance" "server" {
   }
 }
 
+resource "aws_subnet" "nomad" {
+  vpc_id            = aws_vpc.peer.id
+  cidr_block        = local.cidr_block 
+
+  tags = {
+    Name = "tf-example"
+  }
+}
+
 resource "aws_instance" "client" {
   ami                    = var.ami
   instance_type          = var.client_instance_type
+  subnet_id              = aws_subnet.nomad.id
   key_name               = aws_key_pair.keypair.key_name 
   vpc_security_group_ids = [aws_security_group.nomad_ui_ingress.id, aws_security_group.ssh_ingress.id, aws_security_group.clients_ingress.id, aws_security_group.allow_all_internal.id]
   count                  = var.client_count

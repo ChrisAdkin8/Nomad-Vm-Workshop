@@ -1,5 +1,4 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MIT
+provider "hcp" {}
 
 resource "hcp_hvn" "example_hvn" {
   hvn_id         = var.hvn_id
@@ -11,5 +10,5 @@ resource "hcp_consul_cluster" "example_hcp" {
   hvn_id          = hcp_hvn.example_hvn.hvn_id
   cluster_id      = var.cluster_id
   tier            = "development"
-#   public_endpoint = true
+  public_endpoint = true
 }
