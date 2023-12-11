@@ -26,10 +26,11 @@ export AWS_SESSION_TOKEN=<your AWS session token>
 5. Make a note the of the key's Client Id and Client Secret:
 <img style="float: left; margin: 0px 15px 15px 0px;" src="https://github.com/ChrisAdkin8/Nomad-Vm-Workshop/blob/main/png_images/03-HCP-Sp-Key.png?raw=true">
 
-6. Specify environment variables for your HCP Client Id and Client secret:
+6. Specify environment variables for your HCP Client Id, Client secret and project:
 ```
 export HCP_CLIENT_ID=<your client id>
 export HCP_CLIENT_SECRET=<the key generated>
+export HCP_PROJECT_ID=<your project id>
 ```
 
 ### Optional configuration
