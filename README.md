@@ -1,8 +1,19 @@
 # NOMAD Virtual Machine Demo
 
+## Notes
+
 This repo represents a work in progress:
 
-- The Consul cluster element of the configuration is based upon [this HashiCorp tutorial](https://developer.hashicorp.com/consul/tutorials/cloud-production/terraform-hcp-consul-provider)
+- The Consul cluster element of the configuration is based on [this HashiCorp tutorial](https://developer.hashicorp.com/consul/tutorials/cloud-production/terraform-hcp-consul-provider)
+- The Nomad element of the configuration is based on [this repo](https://github.com/chebelom/nomad-aws-demo/tree/main)
+
+To do:
+
+- Applying this configuration will result in the creation of a certificate (.pem file) in the ```terraform/certs``` directory, an EC2 instance needs to be added to the configuration
+  in order to act as a bastion server for accessing the other instances.
+- Add code to the configuration in order to install a Consul client on each instance
+- Test the configuration with Nomad 1.7.1
+- Modify the config to deploy Nomad with ACLs enabled
 
 ## Environment Build Instructions
 
