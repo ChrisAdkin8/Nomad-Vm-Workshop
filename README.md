@@ -43,7 +43,7 @@ export HCP_PROJECT_ID=<your project id>
 
 6. Clone this repo:
 ```
-$ git clone 
+$ git clone https://github.com/ChrisAdkin8/Nomad-Vm-Workshop.git
 ```
 
 7. Change directory to ```Nomad-Vm-Workshop/terraform```:
