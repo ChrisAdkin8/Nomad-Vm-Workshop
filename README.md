@@ -91,7 +91,7 @@ EOT
 lb_address_consul_nomad = "http://54.172.43.18:4646"
 ```
 
-12. ssh access to the nomad cluster clients and server can be achieved via:
+12. ssh access to the nomad cluster client and server EC2 instances can be achieved via:
 ```
 ssh -i certs/id_rsa.pem ubuntu@<client/server IP address>
 ```
