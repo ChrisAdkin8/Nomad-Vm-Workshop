@@ -29,12 +29,12 @@ variable "allowlist_ip" {
 
 variable "server_instance_type" {
   description = "The AWS instance type to use for servers."
-  default     = "t3.micro"
+  default     = "t2.micro"
 }
 
 variable "client_instance_type" {
   description = "The AWS instance type to use for clients."
-  default     = "t3.micro"
+  default     = "t2.micro"
 }
 
 variable "server_count" {
@@ -50,11 +50,6 @@ variable "client_count" {
 variable "root_block_device_size" {
   description = "The volume size of the root block device."
   default     = 16
-}
-
-variable "nomad_version" {
-  default = "1.6.1+ent-1" # ENT
-  # default = "1.6.1-1"   # OSS
 }
 
 variable "nomad_ent" {

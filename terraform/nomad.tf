@@ -2,10 +2,6 @@ provider "aws" {
   region = var.region
 }
 
-data "http" "myip" {
-  url = "http://ipv4.icanhazip.com"
-}
-
 resource "tls_private_key" "keypair_private_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -22,115 +18,12 @@ resource "aws_key_pair" "keypair" {
   }
 }
 
-resource "aws_security_group" "nomad_ui_ingress" {
-  name   = "${var.name}-ui-ingress"
-  vpc_id = aws_vpc.peer.id
-
-  # Nomad
-  ingress {
-    from_port   = 4646
-    to_port     = 4646
-    protocol    = "tcp"
-    cidr_blocks = [var.allowlist_ip, "${chomp(data.http.myip.response_body)}/32"]
-  }
-
-  ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    self      = true
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [ local.cidr_block ]
-  }
-}
-
-resource "aws_security_group" "ssh_ingress" {
-  name   = "${var.name}-ssh-ingress"
-  vpc_id = aws_vpc.peer.id
-
-  # SSH
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.allowlist_ip, "${chomp(data.http.myip.response_body)}/32"]
-  }
-
-  ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    self      = true
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [ local.cidr_block ]
-  }
-}
-
-resource "aws_security_group" "allow_all_internal" {
-  name   = "${var.name}-allow-all-internal"
-  vpc_id = aws_vpc.peer.id
-
-  ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    self      = true
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [ local.cidr_block ]
-  }
-}
-
-resource "aws_security_group" "clients_ingress" {
-  name   = "${var.name}-clients-ingress"
-  vpc_id = aws_vpc.peer.id
-
-  ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    self      = true
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [ local.cidr_block ]
-  }
-
-  # Add application ingress rules here
-  # These rules are applied only to the client nodes
-
-  # nginx example
-  # ingress {
-  #   from_port   = 80
-  #   to_port     = 80
-  #   protocol    = "tcp"
-  #   cidr_blocks = [ local.cidr_block ]
-  # }
-}
-
 resource "aws_instance" "server" {
   ami                    = var.ami
   instance_type          = var.server_instance_type
   subnet_id              = aws_subnet.nomad.id
   key_name               = aws_key_pair.keypair.key_name 
-  vpc_security_group_ids = [aws_security_group.nomad_ui_ingress.id, aws_security_group.ssh_ingress.id, aws_security_group.allow_all_internal.id]
+  vpc_security_group_ids = [aws_security_group.nomad_ui_ingress.id, aws_security_group.ssh_ingress.id, aws_security_group.allow_all_internal.id, aws_security_group.https_egress.id]
   count                  = var.server_count
   user_data = templatefile("${path.module}/config/install-server.sh.tpl", {
     SERVER_NUMBER     = var.server_count
@@ -139,7 +32,6 @@ resource "aws_instance" "server" {
     NOMAD_LICENSE     = var.nomad_license
     DC                = var.nomad_dc
     ACL_ENABLED       = var.nomad_acl_enabled
-    NOMAD_VERSION     = var.nomad_version
     NOMAD_TLS_ENABLED = var.nomad_tls_enabled
     NOMAD_CA_PEM                  = fileexists("${var.nomad_ca_pem}") ? file("${var.nomad_ca_pem}") : ""
     NOMAD_SERVER_PEM              = fileexists("${var.nomad_server_pem}") ? file("${var.nomad_server_pem}") : ""
@@ -175,21 +67,12 @@ resource "aws_instance" "server" {
   }
 }
 
-resource "aws_subnet" "nomad" {
-  vpc_id            = aws_vpc.peer.id
-  cidr_block        = local.cidr_block 
-
-  tags = {
-    Name = "tf-example"
-  }
-}
-
 resource "aws_instance" "client" {
   ami                    = var.ami
   instance_type          = var.client_instance_type
   subnet_id              = aws_subnet.nomad.id
   key_name               = aws_key_pair.keypair.key_name 
-  vpc_security_group_ids = [aws_security_group.nomad_ui_ingress.id, aws_security_group.ssh_ingress.id, aws_security_group.clients_ingress.id, aws_security_group.allow_all_internal.id]
+  vpc_security_group_ids = [aws_security_group.nomad_ui_ingress.id, aws_security_group.ssh_ingress.id, aws_security_group.clients_ingress.id, aws_security_group.allow_all_internal.id, aws_security_group.https_egress.id]
   count                  = var.client_count
   depends_on             = [aws_instance.server]
 
@@ -220,13 +103,11 @@ resource "aws_instance" "client" {
     delete_on_termination = "true"
   }
 
-
   user_data = templatefile("${path.module}/config/install-client.sh.tpl", {
     DC                = var.nomad_dc
     RETRY_JOIN        = var.retry_join
     NOMAD_ENT         = var.nomad_ent
     ACL_ENABLED       = var.nomad_acl_enabled
-    NOMAD_VERSION     = var.nomad_version
     NOMAD_TLS_ENABLED = var.nomad_tls_enabled
     NOMAD_CA_PEM      = fileexists("${var.nomad_ca_pem}") ? file("${var.nomad_ca_pem}") : ""
     NOMAD_CLIENT_PEM              = fileexists("${var.nomad_client_pem}") ? file("${var.nomad_client_pem}") : ""

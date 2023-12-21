@@ -6,7 +6,7 @@ set -o pipefail
 # Docker
 echo "install docker"
 sudo apt-get update
-sudo apt-get install ca-certificates curl gnupg
+sudo apt-get install -y ca-certificates curl gnupg
 sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 sudo chmod a+r /etc/apt/keyrings/docker.gpg
@@ -33,14 +33,7 @@ sudo apt update -y && sudo apt install -y gpg
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 sudo apt-get update -y
-
-if ! ${NOMAD_ENT}
-then 
-    sudo apt-get install -y nomad=${NOMAD_VERSION}
-
-else
-    sudo apt install -y nomad-enterprise=${NOMAD_VERSION}
-fi
+sudo apt-get install -y nomad
 
 sudo cat << EOF > /etc/nomad.d/nomad.hcl
 
