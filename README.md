@@ -66,7 +66,37 @@ $ terraform init
 10. Apply the configuration, this will result in the creation of 23 new resources:
 ```
 $ terraform apply -auto-approve
-```    
+```
+
+11. The tail of the ```terraform apply``` output should look something like this:
+```
+Apply complete! Resources: 28 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+IP_Addresses = <<EOT
+
+Nomad Cluster installed
+SSH default user: ubuntu
+
+Server public IPs: 54.172.43.18, 18.212.218.138, 184.72.134.0
+Client public IPs: 54.167.92.93, 54.80.76.185, 52.73.202.229
+
+If ACL is enabled:
+To get the nomad bootstrap token, run the following on the leader server
+export NOMAD_TOKEN=$(cat /home/ubuntu/nomad_bootstrap)
+
+
+EOT
+lb_address_consul_nomad = "http://54.172.43.18:4646"
+```
+
+12. ssh access to the nomad cluster clients and server can be achieved via:
+```
+ssh -i certs/id_rsa.pem ubuntu@<client/server IP address>
+```
+
+## To Do
 
 ### Optional configuration
 #### enable ACL  
