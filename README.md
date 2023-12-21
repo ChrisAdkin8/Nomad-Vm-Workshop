@@ -98,6 +98,42 @@ ssh -i certs/id_rsa.pem ubuntu@<client/server IP address>
 
 ## To Do
 
+- This repo contains a terraform config for the installation of a Consul client on an EC2 instance
+```https://github.com/hashicorp/learn-consul-terraform```
+- The contents of ```datacenter-deploy-ec2-hcp/2-ec2-consul-client/scripts``` will install the client on an EC2 instance
+  via the ```user_data``` stanza within an ```aws_instance``` resource
+- This discuss thread outlines how to effectively use multiple ```user_data``` blocks within a single ```aws_instance``` resources:
+  https://discuss.hashicorp.com/t/aws-user-data-with-multiple-files-using-templatefile/31754/3
+- Use the basis of this code excerpt to create a ```part``` for deploying a consul client and a ```part``` for deploying nomad:
+```
+data "cloudinit_config" "example" {
+  for_each = var.servers
+
+  part {
+    filename     = "common.sh"
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.root}/scripts/common.sh", {
+      hostname = "${each.value.environment}-server-${each.value.index}.${each.value.domain}"
+    })
+  }
+  part {
+    filename     = "configure.sh"
+    content_type = "text/x-shellscript"
+    content = templatefile("${path.module}/scripts/configure.sh", {
+      hostname = "${each.value.environment}-server-${each.value.index}.${each.value.domain}"
+    })
+  }
+}
+
+resource "aws_instance" "example" {
+  for_each = var.servers
+
+  # ...
+
+  user_data = data.cloudinit_config.example[each.key].rendered
+}
+```
+
 ### Optional configuration
 #### enable ACL  
 to enable and bootstrap the ACL system set  
