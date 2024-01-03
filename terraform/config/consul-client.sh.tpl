@@ -57,6 +57,7 @@ setup_deps
 
 setup_consul
 
+cd /etc/consul.d
 start_service "consul"
 
 # nomad and consul service is type simple and might not be up and running just yet.

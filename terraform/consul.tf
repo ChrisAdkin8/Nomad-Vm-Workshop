@@ -2,6 +2,8 @@ provider "hcp" {}
 
 data "hcp_consul_cluster" "selected" {
   cluster_id = var.cluster_id
+
+  depends_on = [ hcp_consul_cluster.consul ]
 }
 
 resource "hcp_hvn" "hvn" {
