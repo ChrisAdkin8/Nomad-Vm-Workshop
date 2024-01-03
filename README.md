@@ -62,7 +62,7 @@ $ terraform apply -auto-approve
 
 11. The tail of the ```terraform apply``` output should look something like this:
 ```
-Apply complete! Resources: 28 added, 0 changed, 0 destroyed.
+Apply complete! Resources: 29 added, 0 changed, 0 destroyed.
 
 Outputs:
 
@@ -85,45 +85,27 @@ lb_address_consul_nomad = "http://54.172.43.18:4646"
 
 12. ssh access to the nomad cluster client and server EC2 instances can be achieved via:
 ```
-ssh -i certs/id_rsa.pem ubuntu@<client/server IP address>
+$ ssh -i certs/id_rsa.pem ubuntu@<client/server IP address>
 ```
 
-## To Do
-
-- This repo contains a terraform config for the installation of a Consul client on an EC2 instance
-```https://github.com/hashicorp/learn-consul-terraform```
-- The contents of ```datacenter-deploy-ec2-hcp/2-ec2-consul-client/scripts``` will install the client on an EC2 instance
-  via the ```user_data``` stanza within an ```aws_instance``` resource
-- This discuss thread outlines how to effectively use multiple ```user_data``` blocks within a single ```aws_instance``` resources:
-  https://discuss.hashicorp.com/t/aws-user-data-with-multiple-files-using-templatefile/31754/3
-- Use the basis of this code excerpt to create a ```part``` for deploying a consul client and a ```part``` for deploying nomad:
+13. Once ssh'ed into one of the EC2 instances check that the nomad system unit is in a healthy state:
 ```
-data "cloudinit_config" "example" {
-  for_each = var.servers
+$ systemctl status nomad
 
-  part {
-    filename     = "common.sh"
-    content_type = "text/x-shellscript"
-    content = templatefile("${path.root}/scripts/common.sh", {
-      hostname = "${each.value.environment}-server-${each.value.index}.${each.value.domain}"
-    })
-  }
-  part {
-    filename     = "configure.sh"
-    content_type = "text/x-shellscript"
-    content = templatefile("${path.module}/scripts/configure.sh", {
-      hostname = "${each.value.environment}-server-${each.value.index}.${each.value.domain}"
-    })
-  }
-}
+○ nomad.service - Nomad
+     Loaded: loaded (/lib/systemd/system/nomad.service; disabled; vendor preset: enabled)
+     Active: inactive (dead)
+       Docs: https://nomadproject.io/docs/
+```
 
-resource "aws_instance" "example" {
-  for_each = var.servers
+14. Check that the consul agent system unit is in a healthy state:
+```
+$ systemctl status consul
 
-  # ...
-
-  user_data = data.cloudinit_config.example[each.key].rendered
-}
+○ consul.service - "HashiCorp Consul - A service mesh solution"
+     Loaded: loaded (/lib/systemd/system/consul.service; disabled; vendor preset: enabled)
+     Active: inactive (dead)
+       Docs: https://www.consul.io/
 ```
 
 ### Optional configuration
