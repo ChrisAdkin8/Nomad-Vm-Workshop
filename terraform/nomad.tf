@@ -18,6 +18,12 @@ resource "aws_key_pair" "keypair" {
   }
 }
 
+resource "null_resource" "always_run" {
+  triggers = {
+    timestamp = "${timestamp()}"
+  }
+}
+
 data "cloudinit_config" "server_config" {
   part {
     filename     = "consul_client.sh"
@@ -36,6 +42,13 @@ data "cloudinit_config" "server_config" {
       })),
     })
   }
+
+  part {
+    filename     = "nomad_common.sh"
+    content_type = "text/x-shellscript"
+    content      = file("${path.module}/config/nomad-common.sh")
+  }
+
   part {
     filename     = "nomad_server.sh"
     content_type = "text/x-shellscript"
@@ -90,6 +103,12 @@ resource "aws_instance" "server" {
     http_endpoint          = "enabled"
     instance_metadata_tags = "enabled"
   }
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.always_run
+    ]
+  }
 }
 
 data "cloudinit_config" "client_config" {
@@ -110,8 +129,15 @@ data "cloudinit_config" "client_config" {
       })),
     })
   }
+
   part {
-    filename     = "nomad_server.sh"
+    filename     = "nomad_common.sh"
+    content_type = "text/x-shellscript"
+    content      = file("${path.module}/config/nomad-common.sh")
+  }
+
+  part {
+    filename     = "nomad_client.sh"
     content_type = "text/x-shellscript"
     content      = templatefile("${path.module}/config/nomad-client.sh.tpl", {
       DC                = var.nomad_dc
@@ -169,6 +195,12 @@ resource "aws_instance" "client" {
   metadata_options {
     http_endpoint          = "enabled"
     instance_metadata_tags = "enabled"
+  }
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.always_run
+    ]
   }
 }
 
