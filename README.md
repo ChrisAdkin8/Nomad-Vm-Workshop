@@ -136,6 +136,10 @@ $ systemctl status consul
        Docs: https://www.consul.io/
 ```
 
+**Note**
+The process of nomad and consul components being installed by cloudinit may take an extra 30 seconds or so after the terraform config
+has been applied.
+
 ### Optional configuration
 #### enable ACL  
 to enable and bootstrap the ACL system set  
