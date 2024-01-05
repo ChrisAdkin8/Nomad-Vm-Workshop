@@ -38,29 +38,57 @@ export HCP_PROJECT_ID=<your project id>
 $ git clone https://github.com/ChrisAdkin8/Nomad-Vm-Workshop.git
 ```
 
-7. Change directory to ```Nomad-Vm-Workshop/terraform```:
+7. Change directory to the certificates ca directory:
 ```
-$ cd Nomad-Vm-Workshop/terraform
+$ cd terraform/certificates/ca
 ```
 
-8. Specify the environment variables in order that terraform can connect to your AWS account:
+8. Create the tls CA private key and certificate:
+```
+$ nomad tls ca create
+```
+
+9. Create the nomad server private key and certificate and move them to the servers directory:
+```
+$ nomad tls cert create -server -region global
+$ mv *server*.pem ../servers/.
+```
+
+10. Create the nomad client private key and certificate and move them to the clients directory:
+```
+$ nomad tls cert create -client
+$ mv *client*.pem ../clients/.
+```
+
+11. Create the nomad cli private key and certificate and move them to the cli directory:
+```
+$ nomad tls cert create -cli
+$ mv *client*.pem ../cli/.
+```
+
+12. Change directory to ```Nomad-Vm-Workshop/terraform```:
+```
+$ cd ../..
+```
+
+13. Specify the environment variables in order that terraform can connect to your AWS account:
 ```
 export AWS_ACCESS_KEY_ID=<your AWS access key ID>
 export AWS_SECRET_ACCESS_KEY=<your AWS secret access key>
 export AWS_SESSION_TOKEN=<your AWS session token>
 ```
 
-9. Install the provider plugins required by the configuration:
+14. Install the provider plugins required by the configuration:
 ```
 $ terraform init
 ```
     
-10. Apply the configuration, this will result in the creation of 23 new resources:
+15. Apply the configuration, this will result in the creation of 23 new resources:
 ```
 $ terraform apply -auto-approve
 ```
 
-11. The tail of the ```terraform apply``` output should look something like this:
+16. The tail of the ```terraform apply``` output should look something like this:
 ```
 Apply complete! Resources: 29 added, 0 changed, 0 destroyed.
 
@@ -83,12 +111,12 @@ EOT
 lb_address_consul_nomad = "http://54.172.43.18:4646"
 ```
 
-12. ssh access to the nomad cluster client and server EC2 instances can be achieved via:
+17. ssh access to the nomad cluster client and server EC2 instances can be achieved via:
 ```
 $ ssh -i certs/id_rsa.pem ubuntu@<client/server IP address>
 ```
 
-13. Once ssh'ed into one of the EC2 instances check that the nomad system unit is in a healthy state:
+18. Once ssh'ed into one of the EC2 instances check that the nomad system unit is in a healthy state:
 ```
 $ systemctl status nomad
 
@@ -98,7 +126,7 @@ $ systemctl status nomad
        Docs: https://nomadproject.io/docs/
 ```
 
-14. Check that the consul agent system unit is in a healthy state:
+19. Check that the consul agent system unit is in a healthy state:
 ```
 $ systemctl status consul
 
