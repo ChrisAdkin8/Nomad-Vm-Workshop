@@ -3,7 +3,10 @@
 set -e
 set -o pipefail
 
-sudo rm -rf /etc/nomad.d 2> /dev/null
+if [ -d "/etc/nomad.d" ]; then
+  sudo rm -rf /etc/nomad.d
+fi
+
 sudo mkdir /etc/nomad.d
 sudo cat << EOF > /etc/nomad.d/nomad.hcl
 
@@ -24,7 +27,7 @@ client {
 }
 
 acl {
-  enabled = ${ACL_ENABLED}
+  enabled = true 
 }
 
 tls {
@@ -66,3 +69,6 @@ EOF
 sudo cat << EOF > /etc/nomad.d/global-client-nomad-key.pem
 ${NOMAD_CLIENT_KEY}
 EOF
+
+sleep 25
+sudo systemctl start nomad

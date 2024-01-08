@@ -14,13 +14,7 @@ resource "aws_key_pair" "keypair" {
 
   # Create "id_rsa.pem" in local directory
   provisioner "local-exec" {
-    command = "rm -rf certs/id_rsa.pem && mkdir -p certs &&  echo '${tls_private_key.keypair_private_key.private_key_pem}' > certs/id_rsa.pem && chmod 400 certs/id_rsa.pem"
-  }
-}
-
-resource "null_resource" "always_run" {
-  triggers = {
-    timestamp = "${timestamp()}"
+    command = "rm -rf aws_pem/id_rsa.pem && mkdir -p aws_pem &&  echo '${tls_private_key.keypair_private_key.private_key_pem}' > aws_pem/id_rsa.pem && chmod 400 aws_pem/id_rsa.pem"
   }
 }
 
@@ -58,8 +52,6 @@ data "cloudinit_config" "server_config" {
       NOMAD_ENT         = var.nomad_ent
       NOMAD_LICENSE     = var.nomad_license
       DC                = var.nomad_dc
-      ACL_ENABLED       = var.nomad_acl_enabled
-      NOMAD_TLS_ENABLED = var.nomad_tls_enabled
       NOMAD_CA_PEM                  = fileexists("${var.nomad_ca_pem}") ? file("${var.nomad_ca_pem}") : ""
       NOMAD_SERVER_PEM              = fileexists("${var.nomad_server_pem}") ? file("${var.nomad_server_pem}") : ""
       NOMAD_SERVER_KEY              = fileexists("${var.nomad_server_key}") ? file("${var.nomad_server_key}") : ""
@@ -103,12 +95,6 @@ resource "aws_instance" "server" {
     http_endpoint          = "enabled"
     instance_metadata_tags = "enabled"
   }
-
-  lifecycle {
-    replace_triggered_by = [
-      null_resource.always_run
-    ]
-  }
 }
 
 data "cloudinit_config" "client_config" {
@@ -143,8 +129,6 @@ data "cloudinit_config" "client_config" {
       DC                = var.nomad_dc
       RETRY_JOIN        = var.retry_join
       NOMAD_ENT         = var.nomad_ent
-      ACL_ENABLED       = var.nomad_acl_enabled
-      NOMAD_TLS_ENABLED = var.nomad_tls_enabled
       NOMAD_CA_PEM      = fileexists("${var.nomad_ca_pem}") ? file("${var.nomad_ca_pem}") : ""
       NOMAD_CLIENT_PEM              = fileexists("${var.nomad_client_pem}") ? file("${var.nomad_client_pem}") : ""
       NOMAD_CLIENT_KEY              = fileexists("${var.nomad_client_key}") ? file("${var.nomad_client_key}") : ""
@@ -195,12 +179,6 @@ resource "aws_instance" "client" {
   metadata_options {
     http_endpoint          = "enabled"
     instance_metadata_tags = "enabled"
-  }
-
-  lifecycle {
-    replace_triggered_by = [
-      null_resource.always_run
-    ]
   }
 }
 

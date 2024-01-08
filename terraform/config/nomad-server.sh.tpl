@@ -3,7 +3,10 @@
 set -e
 set -o pipefail
 
-sudo rm -rf /etc/nomad.d 2> /dev/null
+if [ -d "/etc/nomad.d" ]; then
+  sudo rm -rf /etc/nomad.d
+fi
+
 sudo mkdir /etc/nomad.d
 sudo chmod 777 /etc/nomad.d
 
@@ -29,7 +32,7 @@ server {
 }
 
 acl {
-  enabled = ${ACL_ENABLED}
+  enabled = true 
 }
 
 # Require TLS
@@ -76,64 +79,5 @@ sudo cat << EOF > /etc/nomad.d/global-server-nomad-key.pem
 ${NOMAD_SERVER_KEY}
 EOF
 
-# init ACL if enabled
-
-if ${ACL_ENABLED}
-then
-  	echo "init Nomad ACL system"
-  
-
-	ACL_DIRECTORY=/tmp/
-	TOKENS_BASE_PATH="/home/ubuntu/"
-	NOMAD_BOOTSTRAP_TOKEN="$TOKENS_BASE_PATH/nomad_bootstrap"
-	NOMAD_USER_TOKEN="$TOKENS_BASE_PATH/nomad_user_token"
-
-
-sudo cat << EOPOL > $ACL_DIRECTORY/nomad-acl-user.hcl
-agent {
-	policy = "read"
-} 
-
-node { 
-	policy = "read" 
-} 
-
-namespace "*" { 
-	policy = "read" 
-	capabilities = ["submit-job", "read-logs", "read-fs"]
-}
-EOPOL
-
-	# Wait for nomad servers to come up and bootstrap nomad ACL
-	for i in {1..12}; do
-		# capture stdout and stderr
-		set +e
-		sleep 5
-		OUTPUT=$(nomad acl bootstrap 2>&1)
-		if [ $? -ne 0 ]; then
-			echo "nomad acl bootstrap: $OUTPUT"
-			if [[ "$OUTPUT" = *"No cluster leader"* ]]; then
-				echo "nomad no cluster leader"
-				continue
-			else
-				echo "nomad already bootstrapped"
-				exit 0
-			fi
-		fi
-		set -e
-
-		echo "$OUTPUT" | grep -i secret | awk -F '=' '{print $2}' | xargs | awk 'NF' > $NOMAD_BOOTSTRAP_TOKEN
-		if [ -s $NOMAD_BOOTSTRAP_TOKEN ]; then
-			echo "nomad bootstrapped"
-			break
-		fi
-	done
-
-	nomad acl policy apply -token "$(cat $NOMAD_BOOTSTRAP_TOKEN)" -description "Policy to allow reading of agents and nodes and listing and submitting jobs in all namespaces." node-read-job-submit $ACL_DIRECTORY/nomad-acl-user.hcl
-
-	nomad acl token create -token "$(cat $NOMAD_BOOTSTRAP_TOKEN)" -name "read-token" -policy node-read-job-submit | grep -i secret | awk -F "=" '{print $2}' | xargs > $NOMAD_USER_TOKEN
-
-	chown ubuntu:ubuntu $NOMAD_BOOTSTRAP_TOKEN $NOMAD_USER_TOKEN
-
-	echo "ACL bootstrap end"
-fi
+sleep 25
+sudo systemctl start nomad
