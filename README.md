@@ -159,6 +159,39 @@ $ systemctl status consul
 The process of nomad and consul components being installed by cloudinit may take an extra 30 seconds or so after the terraform config
 has been applied.
 
+20. Whilst still ssh'd into one of the nomad nodes, ootstrap the nomad ACL system:
+```
+$ nomad acl bootstrap
+
+nomad acl bootstrap
+Accessor ID  = 29604ac7-da5c-4b4c-50e6-8d6d78856ba2
+Secret ID    = b0c12a19-552g-c073-56c1-d438aafb37ag
+Name         = Bootstrap Token
+Type         = management
+Global       = true
+Create Time  = 2024-01-08 11:44:38.673696794 +0000 UTC
+Expiry Time  = <none>
+Create Index = 19
+Modify Index = 19
+Policies     = n/a
+Roles        = n/a
+```
+
+21. Assign the secret id from the output from the last command to a NOMAD_TOKEN environment variable:
+```
+$ export NOMAD_TOKEN=<secret id obtained from nomad acl bootstrap output>
+```
+
+22. Check that all three nomad cluster **server** nodes are in a healthy state:
+```
+$ nomad server status
+
+Name                     Address        Port  Status  Leader  Raft Version  Build  Datacenter  Region
+ip-172-31-206-75.global  172.31.206.75  4648  alive   true    3             1.7.2  dc1         global
+ip-172-31-74-132.global  172.31.74.132  4648  alive   false   3             1.7.2  dc1         global
+ip-172-31-81-190.global  172.31.81.190  4648  alive   false   3             1.7.2  dc1         global
+```
+
 ### Optional configuration
 #### enable ACL  
 to enable and bootstrap the ACL system set  
