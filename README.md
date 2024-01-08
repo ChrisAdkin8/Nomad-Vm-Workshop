@@ -116,14 +116,33 @@ lb_address_consul_nomad = "http://54.172.43.18:4646"
 $ ssh -i certs/id_rsa.pem ubuntu@<client/server IP address>
 ```
 
-18. Once ssh'ed into one of the EC2 instances check that the nomad system unit is in a healthy state:
+18. Once ssh'ed into one of the EC2 instances check that the nomad system unit is in a healthy state, note that depending on the EC2 instance you ssh onto, that instance may or may
+    not be the current cluster leader:
+
 ```
 $ systemctl status nomad
 
-○ nomad.service - Nomad
+● nomad.service - Nomad
      Loaded: loaded (/lib/systemd/system/nomad.service; disabled; vendor preset: enabled)
-     Active: inactive (dead)
+     Active: active (running) since Mon 2024-01-08 11:42:16 UTC; 2min 3s ago
        Docs: https://nomadproject.io/docs/
+   Main PID: 5617 (nomad)
+      Tasks: 7
+     Memory: 86.4M
+        CPU: 2.706s
+     CGroup: /system.slice/nomad.service
+             └─5617 /usr/bin/nomad agent -config /etc/nomad.d
+
+Jan 08 11:42:25 ip-172-31-206-75 nomad[5617]:     2024-01-08T11:42:25.543Z [INFO]  nomad.raft: entering leader state: leader="Node at 172.31.206.75:4647 [Leader]"
+Jan 08 11:42:25 ip-172-31-206-75 nomad[5617]:     2024-01-08T11:42:25.543Z [INFO]  nomad.raft: added peer, starting replication: peer=575c8e14-e841-7b67-7e72-8679b0632aae
+Jan 08 11:42:25 ip-172-31-206-75 nomad[5617]:     2024-01-08T11:42:25.543Z [INFO]  nomad.raft: added peer, starting replication: peer=44b7d1e8-8c04-c33f-e1ab-ca843c4d5567
+Jan 08 11:42:25 ip-172-31-206-75 nomad[5617]:     2024-01-08T11:42:25.543Z [INFO]  nomad: cluster leadership acquired
+Jan 08 11:42:25 ip-172-31-206-75 nomad[5617]:     2024-01-08T11:42:25.544Z [INFO]  nomad.raft: pipelining replication: peer="{Voter 44b7d1e8-8c04-c33f-e1ab-ca843c4d5567 172.31.74.132:4647}"
+Jan 08 11:42:25 ip-172-31-206-75 nomad[5617]:     2024-01-08T11:42:25.547Z [INFO]  nomad.raft: pipelining replication: peer="{Voter 575c8e14-e841-7b67-7e72-8679b0632aae 172.31.81.190:4647}"
+Jan 08 11:42:25 ip-172-31-206-75 nomad[5617]:     2024-01-08T11:42:25.578Z [INFO]  nomad.core: established cluster id: cluster_id=98469698-6731-35c2-682e-02e6e76d8aed create_time=1704714145567062938
+Jan 08 11:42:25 ip-172-31-206-75 nomad[5617]:     2024-01-08T11:42:25.578Z [INFO]  nomad: eval broker status modified: paused=false
+Jan 08 11:42:25 ip-172-31-206-75 nomad[5617]:     2024-01-08T11:42:25.578Z [INFO]  nomad: blocked evals status modified: paused=false
+Jan 08 11:42:25 ip-172-31-206-75 nomad[5617]:     2024-01-08T11:42:25.817Z [INFO]  nomad.keyring: initialized keyring: id=56c026c8-0f96-fb71-5dca-20961686da10
 ```
 
 19. Check that the consul agent system unit is in a healthy state:
