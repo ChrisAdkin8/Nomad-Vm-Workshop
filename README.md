@@ -191,29 +191,3 @@ ip-172-31-206-75.global  172.31.206.75  4648  alive   true    3             1.7.
 ip-172-31-74-132.global  172.31.74.132  4648  alive   false   3             1.7.2  dc1         global
 ip-172-31-81-190.global  172.31.81.190  4648  alive   false   3             1.7.2  dc1         global
 ```
-
-### Optional configuration
-#### enable ACL  
-to enable and bootstrap the ACL system set  
-`nomad_acl_enabled`: `true` 
-
-This enables authentication, therefore you'll need a token to make requests to Nomad.  
-Terraform performs the acl boostrap during the initial cluster creation and generates two tokens.  
-*These tokens are saved on the server leader at these paths:*  
-    - /home/ubuntu/nomad_bootstrap: the bootstap token  
-    - /home/ubuntu/nomad_user_token: a token with a limited scope
-
-To get the nomad bootstrap token, run the following on the leader server  
-`export NOMAD_TOKEN=$(cat /home/ubuntu/nomad_bootstrap)`
-
-
-#### enable TLS  
-Before being able to use this feature, you need to generate the CA and certificates required by Nomad.  
-The `create_tls_certificates.sh` script can do this for you, but you might need to add more [-additional-dnsname](https://developer.hashicorp.com/nomad/docs/commands/tls/cert-create#additional-dnsname) or [-additional-ipaddress](https://developer.hashicorp.com/nomad/docs/commands/tls/cert-create#additional-ipaddress) to match your environment.
-
-
-If you are using different names or paths for your certificates, change the related variables accordingly.
-
-set `nomad_tls_enabled: true` to enable TLS on the nomad cluster
-
-Follow then this [section of the guide](https://developer.hashicorp.com/nomad/tutorials/transport-security/security-enable-tls#running-with-tls) to configure your CLI (or set nomad_tls_verify_https_client to false)      
